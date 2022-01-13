@@ -62,6 +62,7 @@ const preset_list =
 - \`intermediate\` Restricts trials to less than 4, and gives either 0 or 1 master quest dungeon. Disables overworld entrance randomizer and one hit ko.
 - \`coop\` Designed for Co-op play. Restricts skulltula requirements and triforce hunt goals to 50 max. Disables master quest and damage multipliers.
 - \`ddr\` Designed for the DDR ruleset. Enables useful cutscenes and disables damage multipliers for doing glitches.
+- \`xopar\` The xopar special.
 `
 
 bot.login(process.env.CLIENT_TOKEN);
