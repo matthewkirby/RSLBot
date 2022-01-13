@@ -10,7 +10,8 @@ const preset_list = {
     'beginner': '--override=beginner_override.json',
     'intermediate': '--override=intermediate_override.json',
     'coop': '--override=coop_override.json',
-    'ddr': '--override=ddr_override.json'
+    'ddr': '--override=ddr_override.json',
+    'xopar': '--override=xopar.json'
 }
  
  // Load the seed log
