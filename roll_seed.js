@@ -62,7 +62,7 @@ function roll_seed(msg, user, ctime) {
             settings.randomize_settings = false;
         
             // Make the POST request to roll the seed
-            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_6.2.1&locked`, {
+            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_6.2.19&locked`, {
                 method: 'post',
                 body: JSON.stringify(settings),
                 headers: {'Content-Type': 'application/json'}
