@@ -9,7 +9,6 @@ const power_users = ["Xopar#0958"];
 const preset_list = {
     'beginner': '--override=beginner_override.json',
     'intermediate': '--override=intermediate_override.json',
-    'coop': '--override=coop_override.json',
     'ddr': '--override=ddr_override.json',
     'xopar': '--override=xopar.json'
 }
@@ -62,7 +61,7 @@ function roll_seed(msg, user, ctime) {
             settings.randomize_settings = false;
         
             // Make the POST request to roll the seed
-            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_6.2.19&locked`, {
+            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_6.2.29&locked`, {
                 method: 'post',
                 body: JSON.stringify(settings),
                 headers: {'Content-Type': 'application/json'}
