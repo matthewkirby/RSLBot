@@ -10,7 +10,9 @@ const preset_list = {
     'beginner': '--override=beginner_override.json',
     'intermediate': '--override=intermediate_override.json',
     'ddr': '--override=ddr_override.json',
-    'xopar': '--override=xopar.json'
+    'xopar': '--override=xopar.json',
+    'bingo': '--override=bingo_override.json',
+    'intermediate_bingo': '--override=bingo_intermediate_override.json'
 }
  
  // Load the seed log

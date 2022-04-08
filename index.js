@@ -60,7 +60,8 @@ Xopar made me so if you want to complain about your seed, its his fault.
 const preset_list =
 `- \`beginner\` Disables most of Ganon's Castle trials, master quest, overworld entrance randomizer, songs on dungeon rewards, minimal item pool, quad damage, one hit ko, enables a couple of generic speed ups. Also limits skulltula bridge and ganon boss key requirement to a maximum of 50 and restricts entrance randomizer to one of grotto, interior or dungeons.
 - \`intermediate\` Restricts trials to less than 4, and gives either 0 or 1 master quest dungeon. Disables overworld entrance randomizer and one hit ko.
-- \`coop\` Designed for Co-op play. Restricts skulltula requirements and triforce hunt goals to 50 max. Disables master quest and damage multipliers.
+- \`bingo\` Using the default settings as a base, restricts settings to ensure all bingo goals are completable
+- \`intermediate_bingo\` Using the intermediate settings as a base, restricts settings to ensure all bingo goals are completable
 - \`ddr\` Designed for the DDR ruleset. Enables useful cutscenes and disables damage multipliers for doing glitches.
 - \`xopar\` The xopar special.
 `
