@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Partials } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.js');
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 require("dotenv").config();
 const rs = require("./roll_seed.js");
@@ -14,7 +14,7 @@ const bot = new Client({
 
 // Message for when we boot up
 bot.on("ready", () => {
-    bot.user.setActivity("DM me to generate a seed!", { type: "PLAYING" });
+    bot.user.setActivity({name: "DM me for a seed!", game: "DM me!", type: ActivityType.Playing});
     console.log("RSLBot is online!");
 });
 
