@@ -24,8 +24,13 @@ bot.on("messageCreate", msg => {
 function parseDM(msg) {
     const user = `${msg.author.username}#${msg.author.discriminator}`;
     const ctime = new Date(Date.now());
-    tools.record_log(`[${ctime}] ${user}: ${msg.content}`);
+    tools.record_log(bot, `[${ctime}] ${user}: ${msg.content}`);
     if(msg.author.bot) { return; }
+
+    // Check for a bot restart command
+    if(msg.content.startsWith("!reset") && user == "Xopar#0958") {
+        process.exit();
+    }
 
     if(msg.content.startsWith("!seed"))
         rs.roll_seed(msg, user, ctime);
