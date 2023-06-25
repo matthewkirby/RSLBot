@@ -3,18 +3,45 @@ const proc = require('process');
 const fetch = require('node-fetch');
 const fs = require('fs');
 const tools = require("./bot_tools.js");
-const { SystemChannelFlags } = require('discord.js');
+const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
+
 
 const power_users = ["Xopar#0958"];
 const preset_list = {
-    'beginner': '--override=beginner_override.json',
-    'intermediate': '--override=intermediate_override.json',
-    'ddr': '--override=ddr_override.json',
-    'xopar': '--override=xopar.json',
-    'bingo': '--override=bingo_override.json',
-    'intermediate_bingo': '--override=bingo_intermediate_override.json'
+    'Beginner': '--override=beginner_override.json',
+    'Intermediate': '--override=intermediate_override.json',
+    'DDR': '--override=ddr_override.json',
+    'Bingo': '--override=bingo_override.json',
 }
- 
+
+
+// Make button to unlock spoiler log
+const unlockLogButton = new ButtonBuilder()
+    .setCustomId('unlock_log')
+    .setLabel('Unlock Spoiler Log')
+    .setStyle(ButtonStyle.Secondary);
+
+const logUnlockedButton = new ButtonBuilder()
+    .setCustomId('log_unlocked')
+    .setLabel('Log Unlocked')
+    .setStyle(ButtonStyle.Secondary)
+    .setDisabled(true);
+
+function make_seed_buttons(seed_url, unlocked) {
+    const seed_button = new ButtonBuilder()
+        .setURL(seed_url)
+        .setLabel("Download Seed")
+        .setStyle(ButtonStyle.Link);
+
+    const row = new ActionRowBuilder()
+        .addComponents(seed_button);
+    if(unlocked === null) { /* pass */ }
+    else if(unlocked) { row.addComponents(logUnlockedButton); }
+    else { row.addComponents(unlockLogButton); }
+    return row;
+}
+
+
  // Load the seed log
 let seed_log = null;
 const seed_log_path = 'data/seed_log.json';
@@ -27,26 +54,22 @@ if(fs.existsSync(seed_log_path)) {
     tools.record_log("Generated empty seed log");
 }
 
- 
-function roll_seed(msg, user, ctime) {
+
+function roll_seed(interaction, user, ctime) {
     // Test if the user has requested too many seeds
     if(!check_seed_eligibility(user, ctime)) {
-        msg.author.send("You are trying to roll seeds too fast! Please give me at least 15 minutes to relax between seeds.");
         tools.record_log(`[${ctime}] ${user} tried to roll another seed too fast.`);
-        return;
+        interaction.editReply({content: "You are trying to roll seeds too fast! Please give me at least 15 minutes to relax between seeds."});
     }
 
-    // Parse for presets
+    // Parse the preset and update message
     let preset = null;
-    if(msg.content.trim().split(' ').length > 1) {
-        const cpreset = msg.content.trim().split(' ').at(1);
-        if(cpreset in preset_list) {
-            msg.author.send(`Using the ${cpreset} preset...`);
-            preset = preset_list[cpreset];
-        } else {
-            console.log(`${cpreset} is not a valid preset. You can see a summary of all valid presets by saying \`!preset\`.`)
-            return;
-        }
+    const presetname = interaction.customId.split("roll_")[1];
+    if(presetname in preset_list) {
+        interaction.update({content: `Rolling a seed with ${presetname} weights`, components: [] });
+        preset = preset_list[presetname];
+    } else {
+        interaction.update({content: `Rolling a seed with Season 5 weights`, components: [] });
     }
 
     // Roll the seed
@@ -63,7 +86,7 @@ function roll_seed(msg, user, ctime) {
             settings.randomize_settings = false;
         
             // Make the POST request to roll the seed
-            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_6.2.29&locked`, {
+            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_6.2.158&locked`, {
                 method: 'post',
                 body: JSON.stringify(settings),
                 headers: {'Content-Type': 'application/json'}
@@ -76,7 +99,7 @@ function roll_seed(msg, user, ctime) {
             })
             .then(json => {
                 const seed_url = `https://ootrandomizer.com/seed/get?id=${json.id}`;
-                msg.author.send(`Please don't hate me D= ${seed_url}`);
+                interaction.editReply({content: `Here is your seed rolled with ${presetname} weights`, components: [make_seed_buttons(seed_url, false)] });
                 add_seed_to_log(user, ctime, json.id);
                 tools.record_log(`[${ctime}] Rolled a seed for ${user} at ${seed_url}`);
             })
@@ -88,33 +111,36 @@ function roll_seed(msg, user, ctime) {
     proc.chdir('..');
 }
 
-function unlock_seed(msg, user, ctime) {
-    // Unlock a seed that has been generated. An ID can be given by a power user to unlock a specific seed
 
-    // Find the seed to unlock
-    let seedid = null;
-    if(user in seed_log) { seedid = seed_log[user].idlist.at(-1); }
-    else { msg.author.send("You need to generate a seed before you can unlock one!"); return; }
-
+function unlock_seed(interaction) {
+    const seed_url = interaction.message.components[0].components[0].data.url;
+    const seedid = seed_url.split("=")[1]
+    interaction.update({content: interaction.message.content, components: [make_seed_buttons(seed_url, null)] });
+    
     // Unlock the log
     fetch(`https://ootrandomizer.com/api/v2/seed/unlock?key=${process.env.OOTR_API_KEY}&id=${seedid}`,
         {method: 'post', body: '', headers: {'Content-Type': 'application/json'}
     })
     .then(res => {
+        // Catch errors
         if(res.status === 200) { return res.text() }
-        else if(res.status === 404) { msg.author.send("Last seed not found, did the seed have an error while generating?"); throw Error(res.status); }
-        else if(res.status === 204) { msg.author.send("The seed is still generating, please try again in a minute."); throw Error(res.status); }
-        else if(res.status === 208) { msg.author.send("The log is either already unlocked or there is no log available."); throw Error(res.status); }
+        else if(res.status === 404) { interaction.followUp({content: "Seed not found, did the seed have an error while generating?"}); throw Error(res.status); }
+        else if(res.status === 204) { 
+            interaction.editReply({content: interaction.message.content, components: [make_seed_buttons(seed_url, false)]});
+            interaction.followUp({content: "The seed is still generating, please try again in a minute."});
+            throw Error(res.status); }
+        else if(res.status === 208) { interaction.followUp({content: "The log is either already unlocked or there is no log available."}); throw Error(res.status); }
         else { throw Error(res.status); }
     })
     .then(text => {
         console.log(text, `for seed ${seedid}`);
-        msg.author.send(`I just unlocked the log for seed ${seedid}.`)
+        interaction.editReply({content: interaction.message.content, components: [make_seed_buttons(seed_url, true)] });
     })
     .catch(error => {
         console.log(`${error}`)
     })
 }
+
 
 function check_seed_eligibility(user, ctime) {
     // Only roll a seed if its been at least 15 mins since the last seed they rolled.
@@ -128,6 +154,7 @@ function check_seed_eligibility(user, ctime) {
     return false;
 }
 
+
 function add_seed_to_log(user, ctime, id) {
     if(user in seed_log)
         seed_log[user] = { idlist: seed_log[user].idlist.concat(id), timelist: seed_log[user].timelist.concat(ctime), nseeds: seed_log[user].nseeds+1 };
@@ -135,5 +162,6 @@ function add_seed_to_log(user, ctime, id) {
         seed_log[user] = { idlist: [id], timelist: [ctime], nseeds: 1 };
     fs.writeFileSync(seed_log_path, JSON.stringify(seed_log, null, 4));   
 }
+
 
 module.exports = { roll_seed, unlock_seed };

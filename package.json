@@ -2,12 +2,12 @@
   "name": "RSLBot",
   "version": "0.1.0",
   "scripts": {
-    "start": "node index.js",
-    "test": "node testrun_python.js"
+    "start": "node index.js"
   },
   "dependencies": {
-    "discord.js": "^13.3.1",
-    "dotenv": "^10.0.0",
+    "discord.js": "^14.1.2",
+    "dotenv": "^16.0.1",
+    "node-fetch": "^2.6.6",
     "python-shell": "^3.0.1"
   }
 }
