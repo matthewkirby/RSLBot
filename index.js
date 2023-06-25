@@ -33,7 +33,7 @@ function parseDM(msg) {
     if(msg.author.bot) { return; }
 
     // Check for a bot restart command
-    if(msg.content.startsWith("!reset") && user == "Xopar#0958") {
+    if(msg.content.startsWith("!reset") && user == "xopar#0") {
         process.exit();
     }
 
