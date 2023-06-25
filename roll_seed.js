@@ -6,7 +6,7 @@ const tools = require("./bot_tools.js");
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 
 
-const power_users = ["Xopar#0958"];
+const power_users = ["xopar#0"];
 const preset_list = {
     'Beginner': '--override=weights/beginner_override.json',
     'Intermediate': '--override=weights/intermediate_override.json',
@@ -59,7 +59,8 @@ function roll_seed(interaction, user, ctime) {
     // Test if the user has requested too many seeds
     if(!check_seed_eligibility(user, ctime)) {
         tools.record_log(`[${ctime}] ${user} tried to roll another seed too fast.`);
-        interaction.editReply({content: "You are trying to roll seeds too fast! Please give me at least 15 minutes to relax between seeds."});
+        interaction.update({content: "You are trying to roll seeds too fast! Please give me at least 15 minutes to relax between seeds.", components: []});
+        return;
     }
 
     // Parse the preset and update message
