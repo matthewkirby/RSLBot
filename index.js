@@ -41,8 +41,8 @@ function parseDM(msg) {
     const row = new ActionRowBuilder()
         .addComponents(
             new ButtonBuilder()
-                .setCustomId('roll_Season5')
-                .setLabel('Roll an S5 RSL Seed')
+                .setCustomId('roll_Season6')
+                .setLabel('Roll an S6 RSL Seed')
                 .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
                 .setCustomId('view_presets')
@@ -85,8 +85,8 @@ bot.on('interactionCreate', interaction => {
 const presetrow = new ActionRowBuilder()
     .addComponents(
         new ButtonBuilder()
-            .setCustomId('roll_Season5')
-            .setLabel('Roll an S5 RSL Seed')
+            .setCustomId('roll_Season6')
+            .setLabel('Roll an S6 RSL Seed')
             .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
             .setCustomId('roll_Beginner')

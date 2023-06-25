@@ -8,10 +8,10 @@ const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 
 const power_users = ["Xopar#0958"];
 const preset_list = {
-    'Beginner': '--override=beginner_override.json',
-    'Intermediate': '--override=intermediate_override.json',
-    'DDR': '--override=ddr_override.json',
-    'Bingo': '--override=bingo_override.json',
+    'Beginner': '--override=weights/beginner_override.json',
+    'Intermediate': '--override=weights/intermediate_override.json',
+    'DDR': '--override=weights/ddr_override.json',
+    'Bingo': '--override=weights/bingo_override.json',
 }
 
 
@@ -69,7 +69,7 @@ function roll_seed(interaction, user, ctime) {
         interaction.update({content: `Rolling a seed with ${presetname} weights`, components: [] });
         preset = preset_list[presetname];
     } else {
-        interaction.update({content: `Rolling a seed with Season 5 weights`, components: [] });
+        interaction.update({content: `Rolling a seed with Season 6 weights`, components: [] });
     }
 
     // Roll the seed
@@ -86,7 +86,7 @@ function roll_seed(interaction, user, ctime) {
             settings.randomize_settings = false;
         
             // Make the POST request to roll the seed
-            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_6.2.158&locked`, {
+            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_7.1.118&locked`, {
                 method: 'post',
                 body: JSON.stringify(settings),
                 headers: {'Content-Type': 'application/json'}
