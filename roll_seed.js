@@ -55,7 +55,7 @@ if(fs.existsSync(seed_log_path)) {
 }
 
 
-function roll_seed(interaction, user, ctime) {
+function roll_seed(interaction, user, ctime, RSLMETADATA) {
     // Test if the user has requested too many seeds
     if(!check_seed_eligibility(user, ctime)) {
         tools.record_log(`[${ctime}] ${user} tried to roll another seed too fast.`);
@@ -70,7 +70,7 @@ function roll_seed(interaction, user, ctime) {
         interaction.update({content: `Rolling a seed with ${presetname} weights`, components: [] });
         preset = preset_list[presetname];
     } else {
-        interaction.update({content: `Rolling a seed with Season 6 weights`, components: [] });
+        interaction.update({content: `Rolling a seed with Season ${RSLMETADATA.season} weights`, components: [] });
     }
 
     // Roll the seed
@@ -87,7 +87,7 @@ function roll_seed(interaction, user, ctime) {
             settings.randomize_settings = false;
         
             // Make the POST request to roll the seed
-            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_7.1.118&locked`, {
+            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_${RSLMETADATA.ootrversion}&locked`, {
                 method: 'post',
                 body: JSON.stringify(settings),
                 headers: {'Content-Type': 'application/json'}

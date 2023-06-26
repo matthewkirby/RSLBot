@@ -2,3 +2,4 @@
 node_modules
 plando-random-settings
 data/seed_log.json
+ecosystem.config.js

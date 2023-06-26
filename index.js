@@ -5,6 +5,11 @@ const rs = require("./roll_seed.js");
 const tools = require("./bot_tools.js");
 
 
+const RSLMETADATA = {
+    season: 6,
+    ootrversion: "7.1.118"
+};
+
 // Initialize the bot
 const bot = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages],
@@ -41,8 +46,8 @@ function parseDM(msg) {
     const row = new ActionRowBuilder()
         .addComponents(
             new ButtonBuilder()
-                .setCustomId('roll_Season6')
-                .setLabel('Roll an S6 RSL Seed')
+                .setCustomId(`roll_Season${RSLMETADATA.season}`)
+                .setLabel(`Roll an S${RSLMETADATA.season} RSL Seed`)
                 .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
                 .setCustomId('view_presets')
@@ -65,7 +70,7 @@ bot.on('interactionCreate', interaction => {
     const user = `${interaction.user.username}#${interaction.user.discriminator}`;
 
     if(cid.startsWith("roll_")) {
-        rs.roll_seed(interaction, user, ctime);
+        rs.roll_seed(interaction, user, ctime, RSLMETADATA);
     }
     else if(cid === "unlock_log") {
         rs.unlock_seed(interaction);
@@ -85,8 +90,8 @@ bot.on('interactionCreate', interaction => {
 const presetrow = new ActionRowBuilder()
     .addComponents(
         new ButtonBuilder()
-            .setCustomId('roll_Season6')
-            .setLabel('Roll an S6 RSL Seed')
+            .setCustomId(`roll_Season${RSLMETADATA.season}`)
+            .setLabel(`Roll an S${RSLMETADATA.season} RSL Seed`)
             .setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
             .setCustomId('roll_Beginner')
