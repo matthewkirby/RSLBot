@@ -2,11 +2,25 @@ const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.j
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 require("dotenv").config();
 const rs = require("./roll_seed.js");
+const fs = require("fs");
 
+
+// Load some metadata from the RSL script
+let rslversion = null;
+let ootrversion = null;
+const rslpath = 'plando-random-settings/rslversion.py';
+if(fs.existsSync(rslpath)) {
+    version_body = fs.readFileSync(rslpath, 'utf8');
+    rslversion = version_body.split('\n')[0].split('=')[1].trim().slice(1,-1);
+    ootrversion = version_body.split('\n')[2].split('=')[1].trim().split(' R')[0].slice(1).trim();
+} else {
+    throw new Error("RSL Script must be cloned in the bot directory.");
+}
 
 const RSLMETADATA = {
     season: 6,
-    ootrversion: "7.1.143",
+    ootrversion: ootrversion,
+    rslversion: rslversion,
     admin: ["xopar#0"],
     // These are the RSL organizers
     moderator: [".cola#0", "cubsrule21#0", "emosoda#0", "kirox#0", "slyryd#0", "timmy2405#0", "trenter_tr#0"],
@@ -59,10 +73,7 @@ function parseDM(msg) {
     // Parse generic message and send button options
     const row = new ActionRowBuilder()
         .addComponents(
-            new ButtonBuilder()
-                .setCustomId(`roll_Season${RSLMETADATA.season}`)
-                .setLabel(`Roll an S${RSLMETADATA.season} RSL Seed`)
-                .setStyle(ButtonStyle.Primary),
+            rsl_seasonal_button,
             new ButtonBuilder()
                 .setCustomId('view_presets')
                 .setLabel('View Presets')
@@ -131,13 +142,14 @@ function parse_user_info(event, event_type) {
     return { username: username, user_level: user_level }
 }
 
+const rsl_seasonal_button = new ButtonBuilder()
+    .setCustomId(`roll_Season${RSLMETADATA.season}`)
+    .setLabel(`Roll an S${RSLMETADATA.season} RSL Seed (v${RSLMETADATA.rslversion})`)
+    .setStyle(ButtonStyle.Primary);
 
 const presetrow = new ActionRowBuilder()
     .addComponents(
-        new ButtonBuilder()
-            .setCustomId(`roll_Season${RSLMETADATA.season}`)
-            .setLabel(`Roll an S${RSLMETADATA.season} RSL Seed`)
-            .setStyle(ButtonStyle.Primary),
+        rsl_seasonal_button,
         new ButtonBuilder()
             .setCustomId('roll_Beginner')
             .setLabel('Roll a Beginner RSL Seed')

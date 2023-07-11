@@ -99,7 +99,7 @@ function roll_seed(interaction, userinfo, ctime, RSLMETADATA) {
             })
             .then(json => {
                 const seed_url = `https://ootrandomizer.com/seed/get?id=${json.id}`;
-                interaction.editReply({content: `Here is your seed rolled with ${presetname} weights`, components: [make_seed_buttons(seed_url, false)] });
+                interaction.editReply({content: `Here is your seed rolled with ${presetname} weights (v${RSLMETADATA.rslversion})`, components: [make_seed_buttons(seed_url, false)] });
                 add_seed_to_log(userinfo.username, ctime, json.id);
             })
             .catch(error => {
