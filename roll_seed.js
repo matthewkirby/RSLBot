@@ -2,7 +2,6 @@ const {PythonShell} = require('python-shell');
 const proc = require('process');
 const fetch = require('node-fetch');
 const fs = require('fs');
-const tools = require("./bot_tools.js");
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 
 
