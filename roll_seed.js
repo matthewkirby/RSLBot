@@ -6,7 +6,6 @@ const tools = require("./bot_tools.js");
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 
 
-const power_users = ["xopar#0"];
 const preset_list = {
     'Beginner': '--override=weights/beginner_override.json',
     'Intermediate': '--override=weights/intermediate_override.json',
@@ -47,19 +46,20 @@ let seed_log = null;
 const seed_log_path = 'data/seed_log.json';
 if(fs.existsSync(seed_log_path)) {
     seed_log = JSON.parse(fs.readFileSync(seed_log_path));
-    tools.record_log("Successfully loaded the seed log");
 } else {
     seed_log = {};
     fs.writeFileSync(seed_log_path, JSON.stringify(seed_log, null, 4));
-    tools.record_log("Generated empty seed log");
 }
 
 
-function roll_seed(interaction, user, ctime, RSLMETADATA) {
+function roll_seed(interaction, userinfo, ctime, RSLMETADATA) {
     // Test if the user has requested too many seeds
-    if(!check_seed_eligibility(user, ctime)) {
-        tools.record_log(`[${ctime}] ${user} tried to roll another seed too fast.`);
-        interaction.update({content: "You are trying to roll seeds too fast! Please give me at least 15 minutes to relax between seeds.", components: []});
+    const eligibility = check_seed_eligibility(userinfo, ctime);
+    if(!eligibility.status) {
+        interaction.update({
+            content: `Please wait at least ${eligibility.cooldown / 60} minutes between seeds. You have ${eligibility.remaining} seconds remaining.`,
+            components: []
+        });
         return;
     }
 
@@ -101,8 +101,7 @@ function roll_seed(interaction, user, ctime, RSLMETADATA) {
             .then(json => {
                 const seed_url = `https://ootrandomizer.com/seed/get?id=${json.id}`;
                 interaction.editReply({content: `Here is your seed rolled with ${presetname} weights`, components: [make_seed_buttons(seed_url, false)] });
-                add_seed_to_log(user, ctime, json.id);
-                tools.record_log(`[${ctime}] Rolled a seed for ${user} at ${seed_url}`);
+                add_seed_to_log(userinfo.username, ctime, json.id);
             })
             .catch(error => {
                 console.log(`[${ctime}] ${error}`);
@@ -143,24 +142,42 @@ function unlock_seed(interaction) {
 }
 
 
-function check_seed_eligibility(user, ctime) {
-    // Only roll a seed if its been at least 15 mins since the last seed they rolled.
-    if(user in seed_log) {
-        const ltime = new Date(seed_log[user].timelist.at(-1));
-        if((ctime - ltime > 15 * 60 * 1000) || power_users.includes(user))
-            return true;
+function check_seed_eligibility(userinfo, ctime) {
+    const cooldowns_seconds = {
+        "admin": 0,
+        "moderator": 30,
+        "organizer": 120
     }
-    else
-        return true;
-    return false;
+
+    // Return seed roll eligibility based on user rank and the last time they rolled a seed
+    const cooldown = userinfo.user_level in cooldowns_seconds ? cooldowns_seconds[userinfo.user_level] : 15 * 60;
+    const eligibility = { status: true, cooldown: cooldown, remaining: null };
+    if(userinfo.username in seed_log) {
+        const ltime = new Date(seed_log[userinfo.username].timelist.at(-1));
+        const remaining_time = cooldown * 1000 - (ctime - ltime);
+        if(remaining_time > 0) {
+            eligibility.status = false;
+            eligibility.remaining = Math.floor(remaining_time / 1000);
+        }
+    }
+
+    return eligibility;
 }
 
 
-function add_seed_to_log(user, ctime, id) {
-    if(user in seed_log)
-        seed_log[user] = { idlist: seed_log[user].idlist.concat(id), timelist: seed_log[user].timelist.concat(ctime), nseeds: seed_log[user].nseeds+1 };
+function add_seed_to_log(username, ctime, id) {
+    if(username in seed_log)
+        seed_log[username] = {
+            idlist: seed_log[username].idlist.concat(id),
+            timelist: seed_log[username].timelist.concat(ctime),
+            nseeds: seed_log[username].nseeds+1
+        };
     else
-        seed_log[user] = { idlist: [id], timelist: [ctime], nseeds: 1 };
+        seed_log[username] = {
+            idlist: [id],
+            timelist: [ctime],
+            nseeds: 1
+        };
     fs.writeFileSync(seed_log_path, JSON.stringify(seed_log, null, 4));   
 }
 

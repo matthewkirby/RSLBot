@@ -2,12 +2,15 @@ const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.j
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 require("dotenv").config();
 const rs = require("./roll_seed.js");
-const tools = require("./bot_tools.js");
 
 
 const RSLMETADATA = {
     season: 6,
-    ootrversion: "7.1.118"
+    ootrversion: "7.1.143",
+    admin: ["xopar#0"],
+    // These are the RSL organizers
+    moderator: [".cola#0", "cubsrule21#0", "emosoda#0", "kirox#0", "slyryd#0", "timmy2405#0", "trenter_tr#0"],
+    organizer: []
 };
 
 // Initialize the bot
@@ -32,14 +35,25 @@ bot.on("messageCreate", msg => {
 
 
 function parseDM(msg) {
-    const user = `${msg.author.username}#${msg.author.discriminator}`;
-    const ctime = new Date(Date.now());
-    tools.record_log(bot, `[${ctime}] ${user}: ${msg.content}`);
     if(msg.author.bot) { return; }
+    const userinfo = parse_user_info(msg, "MESSAGE");
 
     // Check for a bot restart command
-    if(msg.content.startsWith("!reset") && user == "xopar#0") {
-        process.exit();
+    if (msg.content.startsWith("!reset")) {
+        if (userinfo.user_level === "admin") {
+            msg.author.send({ content: "Restarting..." });
+            process.exit();
+        }
+        else {
+            msg.author.send({ content: "Permission denied." });
+            return;
+        }
+    }
+
+    // Return the user's status
+    if (msg.content.startsWith("!status")) {
+        msg.author.send({ content: `You have permissions level ${userinfo.user_level}.` });
+        return;
     }
 
     // Parse generic message and send button options
@@ -65,12 +79,12 @@ function parseDM(msg) {
 // Parse buttons
 bot.on('interactionCreate', interaction => {
 	if (!interaction.isButton()) return;
-    const cid = interaction.customId;
     const ctime = new Date(Date.now());
-    const user = `${interaction.user.username}#${interaction.user.discriminator}`;
+    const cid = interaction.customId;
+    const userinfo = parse_user_info(interaction, "INTERACTION");
 
     if(cid.startsWith("roll_")) {
-        rs.roll_seed(interaction, user, ctime, RSLMETADATA);
+        rs.roll_seed(interaction, userinfo, ctime, RSLMETADATA);
     }
     else if(cid === "unlock_log") {
         rs.unlock_seed(interaction);
@@ -81,10 +95,41 @@ bot.on('interactionCreate', interaction => {
             components:[presetrow]
         })
     }
-
-
-
 });
+
+
+function set_user_level(username) {
+    if (RSLMETADATA.admin.includes(username)) {
+        return "admin";
+    }
+    else if (RSLMETADATA.moderator.includes(username)) {
+        return "moderator";
+    }
+    else if (RSLMETADATA.organizer.includes(username)) {
+        return "organizer";
+    }
+    else {
+        return "user";
+    }
+}
+
+
+function parse_user_info(event, event_type) {
+    let user_object = null;
+    if (event_type === "INTERACTION") {
+        user_object = event.user;
+    }
+    else if (event_type === "MESSAGE") {
+        user_object = event.author;
+    }
+    else {
+        console.log(`While parsing user info, event type ${event_type} not recognized.`)
+        return null;
+    }
+    const username = `${user_object.username}#${user_object.discriminator}`;
+    const user_level = set_user_level(username);
+    return { username: username, user_level: user_level }
+}
 
 
 const presetrow = new ActionRowBuilder()
