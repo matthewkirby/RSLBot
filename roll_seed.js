@@ -3,6 +3,7 @@ const proc = require('process');
 const fetch = require('node-fetch');
 const fs = require('fs');
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
+const { metadata } = require("./metadata.js");
 
 
 const presetList = {
@@ -51,7 +52,7 @@ if(fs.existsSync(seedLogPath)) {
 }
 
 
-function rollSeed(interaction, userinfo, currentTime, RSLMETADATA) {
+function rollSeed(interaction, userinfo, currentTime) {
     // Test if the user has requested too many seeds
     const eligibility = checkSeedEligibility(userinfo, currentTime);
     if(!eligibility.status) {
@@ -69,7 +70,7 @@ function rollSeed(interaction, userinfo, currentTime, RSLMETADATA) {
         interaction.update({content: `Rolling a seed with ${presetName} weights`, components: [] });
         preset = presetList[presetName];
     } else {
-        interaction.update({content: `Rolling a seed with Season ${RSLMETADATA.season} weights`, components: [] });
+        interaction.update({content: `Rolling a seed with Season ${metadata.season} weights`, components: [] });
     }
 
     // Roll the seed
@@ -86,7 +87,7 @@ function rollSeed(interaction, userinfo, currentTime, RSLMETADATA) {
             settings.randomize_settings = false;
         
             // Make the POST request to roll the seed
-            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_${RSLMETADATA.ootrversion}&locked`, {
+            fetch(`https://ootrandomizer.com/api/v2/seed/create?key=${process.env.OOTR_API_KEY}&version=devRSL_${metadata.ootrVersion}&locked`, {
                 method: 'post',
                 body: JSON.stringify(settings),
                 headers: {'Content-Type': 'application/json'}
@@ -98,7 +99,7 @@ function rollSeed(interaction, userinfo, currentTime, RSLMETADATA) {
                     throw Error(res.status);
             })
             .then(json => {
-                checkSeedGenerationStatus(json.id, interaction, userinfo.username, currentTime, presetName, RSLMETADATA);
+                checkSeedGenerationStatus(json.id, interaction, userinfo.username, currentTime, presetName);
             })
             .catch(error => {
                 console.log(`[${currentTime}] ${error}`);
@@ -109,7 +110,7 @@ function rollSeed(interaction, userinfo, currentTime, RSLMETADATA) {
 }
 
 
-function checkSeedGenerationStatus(seedId, interaction, username, currentTime, presetName, RSLMETADATA) {
+function checkSeedGenerationStatus(seedId, interaction, username, currentTime, presetName) {
     const statusCheckInterval = setInterval(() => {
         fetch(`https://ootrandomizer.com/api/v2/seed/status?key=${process.env.OOTR_API_KEY}&id=${seedId}`)
         .then(res => {
@@ -129,7 +130,7 @@ function checkSeedGenerationStatus(seedId, interaction, username, currentTime, p
                 clearInterval(statusCheckInterval);
                 const seedUrl = `https://ootrandomizer.com/seed/get?id=${seedId}`;
                 interaction.editReply({
-                    content: `Here is your seed rolled with ${presetName} weights (v${RSLMETADATA.rslversion})`,
+                    content: `Here is your seed rolled with ${presetName} weights (v${metadata.rslVersion})`,
                     components: [makeSeedButtons(seedUrl, false)]
                 });
                 addSeedToLog(username, currentTime, seedId);

@@ -2,30 +2,8 @@ const { Client, GatewayIntentBits, Partials, ActivityType } = require('discord.j
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 require("dotenv").config();
 const rs = require("./roll_seed.js");
-const fs = require("fs");
+const { metadata } = require("./metadata.js");
 
-
-// Load some metadata from the RSL script
-let rslversion = null;
-let ootrversion = null;
-const rslpath = 'plando-random-settings/rslversion.py';
-if(fs.existsSync(rslpath)) {
-    version_body = fs.readFileSync(rslpath, 'utf8');
-    rslversion = version_body.split('\n')[0].split('=')[1].trim().slice(1,-1);
-    ootrversion = version_body.split('\n')[2].split('=')[1].trim().split(' R')[0].slice(1).trim();
-} else {
-    throw new Error("RSL Script must be cloned in the bot directory.");
-}
-
-const RSLMETADATA = {
-    season: 6,
-    ootrversion: ootrversion,
-    rslversion: rslversion,
-    admin: ["xopar#0"],
-    // These are the RSL organizers
-    moderator: [".cola#0", "cubsrule21#0", "emosoda#0", "kirox#0", "slyryd#0", "timmy2405#0", "trenter_tr#0"],
-    organizer: []
-};
 
 // Initialize the bot
 const bot = new Client({
@@ -95,7 +73,7 @@ bot.on('interactionCreate', interaction => {
     const userinfo = parse_user_info(interaction, "INTERACTION");
 
     if(cid.startsWith("roll_")) {
-        rs.rollSeed(interaction, userinfo, ctime, RSLMETADATA);
+        rs.rollSeed(interaction, userinfo, ctime);
     }
     else if(cid === "unlock_log") {
         rs.unlockSeed(interaction);
@@ -110,13 +88,13 @@ bot.on('interactionCreate', interaction => {
 
 
 function set_user_level(username) {
-    if (RSLMETADATA.admin.includes(username)) {
+    if (metadata.admin.includes(username)) {
         return "admin";
     }
-    else if (RSLMETADATA.moderator.includes(username)) {
+    else if (metadata.moderator.includes(username)) {
         return "moderator";
     }
-    else if (RSLMETADATA.organizer.includes(username)) {
+    else if (metadata.organizer.includes(username)) {
         return "organizer";
     }
     else {
@@ -143,8 +121,8 @@ function parse_user_info(event, event_type) {
 }
 
 const rsl_seasonal_button = new ButtonBuilder()
-    .setCustomId(`roll_Season${RSLMETADATA.season}`)
-    .setLabel(`Roll an S${RSLMETADATA.season} RSL Seed (v${RSLMETADATA.rslversion})`)
+    .setCustomId(`roll_Season${metadata.season}`)
+    .setLabel(`Roll an S${metadata.season} RSL Seed (v${metadata.rslVersion})`)
     .setStyle(ButtonStyle.Primary);
 
 const presetrow = new ActionRowBuilder()
