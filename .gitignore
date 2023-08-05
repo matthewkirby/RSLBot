@@ -1,4 +1,9 @@
 .env*
+.vscode
 node_modules
+
+# RSL Script
 plando-random-settings
-data/seed_log.json
+
+# Data
+data/
