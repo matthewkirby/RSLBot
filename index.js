@@ -95,10 +95,10 @@ bot.on('interactionCreate', interaction => {
     const userinfo = parse_user_info(interaction, "INTERACTION");
 
     if(cid.startsWith("roll_")) {
-        rs.roll_seed(interaction, userinfo, ctime, RSLMETADATA);
+        rs.rollSeed(interaction, userinfo, ctime, RSLMETADATA);
     }
     else if(cid === "unlock_log") {
-        rs.unlock_seed(interaction);
+        rs.unlockSeed(interaction);
     }
     else if(cid === "view_presets") {
         interaction.update({
