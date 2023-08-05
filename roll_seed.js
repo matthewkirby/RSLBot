@@ -98,9 +98,7 @@ function roll_seed(interaction, userinfo, ctime, RSLMETADATA) {
                     throw Error(res.status);
             })
             .then(json => {
-                const seed_url = `https://ootrandomizer.com/seed/get?id=${json.id}`;
-                interaction.editReply({content: `Here is your seed rolled with ${presetname} weights (v${RSLMETADATA.rslversion})`, components: [make_seed_buttons(seed_url, false)] });
-                add_seed_to_log(userinfo.username, ctime, json.id);
+                checkSeedGenerationStatus(json.id, interaction, userinfo.username, ctime, presetname, RSLMETADATA);
             })
             .catch(error => {
                 console.log(`[${ctime}] ${error}`);
@@ -109,6 +107,48 @@ function roll_seed(interaction, userinfo, ctime, RSLMETADATA) {
     })
     proc.chdir('..');
 }
+
+
+function checkSeedGenerationStatus(seedId, interaction, username, currentTime, presetName, RSLMETADATA) {
+    const statusCheckInterval = setInterval(() => {
+        fetch(`https://ootrandomizer.com/api/v2/seed/status?key=${process.env.OOTR_API_KEY}&id=${seedId}`)
+        .then(res => {
+            if (res.status === 200) { return res.json(); }
+            else { throw Error(res.status); }
+        })
+        .then(res => {
+            const status = res.status;
+            const progress = res.progress
+            if (status === 0) {
+                if (res.positionQueue > 0) {
+                    interaction.editReply({content: `Position in queue: ${res.positionQueue}%`})
+                } else {
+                    interaction.editReply({content: `Generating your seed: ${progress}%`})
+                }
+            } else if (status === 1) {
+                clearInterval(statusCheckInterval);
+                const seedUrl = `https://ootrandomizer.com/seed/get?id=${seedId}`;
+                interaction.editReply({
+                    content: `Here is your seed rolled with ${presetName} weights (v${RSLMETADATA.rslversion})`,
+                    components: [make_seed_buttons(seedUrl, false)]
+                });
+                add_seed_to_log(username, currentTime, seedId);
+            } else if (status === 3) {
+                clearInterval(statusCheckInterval);
+                interaction.editReply({
+                    content: `Generation of seed ${seedId} failed. This happens sometimes with certain settings combinations.
+                    Please try again. If this has happen multiple times, please dm \`xopar\` on discord or in the Ocarina
+                    of Time Randomizer discord server.`
+                })
+                console.log(`[${currentTime}] Seed ${seedId} failed to generate`);
+            }
+        })
+        .catch(error => {
+            clearInterval(statusCheckInterval);
+            console.log(`[${currentTime}] Error checking seed status: ${error}`);
+        });
+    }, 5000);
+};
 
 
 function unlock_seed(interaction) {
