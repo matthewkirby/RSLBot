@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": "./src/",
     "outDir": "./dist/",
+    "noImplicitAny": true, // REMOVE THIS LATER
     "importHelpers": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
@@ -15,7 +16,7 @@
     "baseUrl": "./"
   },
   "files": [
-    "src/Bot.ts"
+    "src/RSLBot.ts"
   ],
   "include": [
     "./**/*.ts"

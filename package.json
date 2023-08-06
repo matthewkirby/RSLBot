@@ -1,9 +1,10 @@
 {
   "name": "rslbot",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "scripts": {
-    "start": "node index.js",
-    "lint": "eslint ."
+    "start": "ts-node-esm src/RSLBot.ts",
+    "deploy": "ts-node-esm src/deployCommands.ts",
+    "lint": "eslint ./src/"
   },
   "dependencies": {
     "discord.js": "^14.9.0",
