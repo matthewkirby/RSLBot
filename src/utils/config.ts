@@ -1,9 +1,10 @@
 import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 // Load the RSL and OoTR versions being used
-const rslPath = '../../plando-random-settings/rslversion.py';
+const rslPath = join(__dirname, '../../plando-random-settings/rslversion.py');
 if (!existsSync(rslPath)) {
   console.error('RSL script must be cloned in the bot directory.');
 }
