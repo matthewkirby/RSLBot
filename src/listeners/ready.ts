@@ -1,5 +1,5 @@
 import { ActivityType } from 'discord.js';
-import { FatClient } from 'src/types/FatClient';
+import { FatClient } from 'types/FatClient';
 import loadSlashCommands from '../commands';
 
 export default (client: FatClient): void => {
@@ -14,9 +14,10 @@ export default (client: FatClient): void => {
     // Load the list of slash commands
     const slashCommands = await loadSlashCommands();
     for (const command of slashCommands) {
-      client.slashCommands.set(command.data.name, command);
+      client.slashCommands.set(command.name, command);
     }
 
+    client.application.fetch();
     console.log(`${client.user.username} is online`);
   });
 };

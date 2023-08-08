@@ -24,7 +24,7 @@ interface AppConfig {
   organizer: string[]
 }
 
-const config: AppConfig = {
+export const config: AppConfig = {
   clientToken: process.env.CLIENT_TOKEN || '',
   clientId: process.env.CLIENT_ID || '',
   ootrApiKey: process.env.OOTR_API_KEY || '',
@@ -36,4 +36,14 @@ const config: AppConfig = {
   organizer: []
 }
 
-export default config;
+export const getUserPermissions = (username: string): number => {
+  if (config.admin.includes(username)) {
+    return 4;
+  } else if (config.moderator.includes(username)) {
+    return 3;
+  } else if (config.organizer.includes(username)) {
+    return 2;
+  } else {
+    return 1;
+  }
+};

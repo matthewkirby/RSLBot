@@ -1,9 +1,9 @@
 import { Interaction, ChatInputCommandInteraction } from 'discord.js';
-import { FatClient } from 'src/types/FatClient';
+import { FatClient } from 'types/FatClient';
 
 export default (client: FatClient): void => {
   client.on('interactionCreate', async (interaction: Interaction) => {
-    console.log(interaction);
+    // console.log(interaction);
 
     if (interaction.isChatInputCommand()) {
       await handleSlashCommand(interaction);
