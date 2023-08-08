@@ -8,19 +8,3 @@ export default (client: FatClient): void => {
     console.log(message);
   });
 };
-
-//   // Parse generic message and send button options
-//   const row = new ActionRowBuilder()
-//       .addComponents(
-//           rsl_seasonal_button,
-//           new ButtonBuilder()
-//               .setCustomId('view_presets')
-//               .setLabel('View Presets')
-//               .setStyle(ButtonStyle.Secondary)
-//       )
-
-//   msg.author.send({
-//       content: "Click a button below to see what I can do!",
-//       components: [row]
-//   });
-// }

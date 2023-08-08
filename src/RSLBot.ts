@@ -1,7 +1,5 @@
 import { FatClient } from './types/FatClient';
-import ready from './listeners/ready';
-import interactionCreate from './listeners/interactionCreate';
-import messageCreate from './listeners/messageCreate';
+import { ready, interactionCreate, messageCreate } from './listeners';
 import { config } from './utils/config';
 import { GatewayIntentBits, Partials } from 'discord.js';
 
