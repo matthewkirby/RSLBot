@@ -23,5 +23,5 @@ export const openDbConnection = (): DatabaseType => {
 export const getUserPermission = (db: DatabaseType, user: User): number => {
   const selectQuery = db.prepare('SELECT userid, permissions FROM discord WHERE userid=?');
   const res = selectQuery.get(user.id) as {userid: string, permissions: number};
-  return res.permissions;
+  return res?.permissions ?? config.rankNumbers[3];
 };
