@@ -2,8 +2,8 @@ import { basename, join } from 'path';
 import { readdirSync } from 'fs';
 import { SlashCommand } from 'types/SlashCommand';
 import { ChatInputCommandInteraction } from 'discord.js';
-import { getUserPermissions } from '../utils/config';
-import { getUniqueUserName } from '../utils/tools';
+import { FatClient } from 'types/FatClient';
+import { getUserPermission } from '../utils/dbInteraction';
 
 async function loadSlashCommands(): Promise<SlashCommand[]> {
   const slashCommands: SlashCommand[] = [];
@@ -26,8 +26,8 @@ async function loadSlashCommands(): Promise<SlashCommand[]> {
 
       // Replace the execute function with one that checks permissions first.
       command.execute = async (interaction: ChatInputCommandInteraction) => {
-        const userPermission = getUserPermissions(getUniqueUserName(interaction.user));
-
+        const client = interaction.client as FatClient;
+        const userPermission = getUserPermission(client.db, interaction.user);
         if (userPermission >= command.requiredPermission) {
           await originalExecute(interaction);
         } else {

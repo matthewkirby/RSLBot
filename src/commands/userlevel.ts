@@ -1,6 +1,7 @@
 import { SlashCommand } from 'types/SlashCommand';
-import { getUserPermissions } from '../utils/config';
-import { getUniqueUserName } from '../utils/tools';
+import { getUserPermission } from '../utils/dbInteraction';
+import { FatClient } from 'types/FatClient';
+import { bold } from 'discord.js';
 
 const levelNames = ['user', 'organizer', 'moderator', 'admin'];
 
@@ -9,8 +10,8 @@ export const userlevel: SlashCommand = {
   description:'Returns your internal permission level with RSLBot.',
   requiredPermission: 1,
   async execute(interaction) {
-    const username = getUniqueUserName(interaction.user);
-    const userLevel = getUserPermissions(username);
-    await interaction.reply(`You have permission level **${levelNames[userLevel-1]}**.`);
+    const client = interaction.client as FatClient;
+    const permissions = getUserPermission(client.db, interaction.user);
+    await interaction.reply(`You have permission level ${bold(levelNames[permissions-1])}.`);
   },
 };
