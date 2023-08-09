@@ -1,15 +1,17 @@
 import { Client, ClientOptions, Collection } from 'discord.js';
-import { SlashCommand } from './SlashCommand';
 import { Database as DatabaseType } from 'better-sqlite3';
+import { ButtonCollection, SlashCommandCollection } from './commonTypes';
 
 
 export class FatClient extends Client {
-  public slashCommands: Collection<string, SlashCommand>;
+  public slashCommands: SlashCommandCollection;
+  public buttonLibrary: ButtonCollection;
   private _db: DatabaseType | undefined;
 
   constructor(options: ClientOptions) {
     super(options);
     this.slashCommands = new Collection();
+    this.buttonLibrary = new Collection();
   };
 
   get db(): DatabaseType {

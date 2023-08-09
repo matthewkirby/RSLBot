@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS discord (
 CREATE TABLE IF NOT EXISTS seedlog (
   seedid TEXT PRIMARY KEY,      -- seed id returned by ootrandomizer.com api
   unlocked INTEGER DEFAULT 0,   -- 0 if log is locked, 1 if unlocked. Logs are locked unless specifically unlocked
+  name TEXT DEFAULT null,       -- User provided name for the seed
   preset TEXT,                  -- RSL preset used to generate the seed
   rslversion TEXT,              -- Version of the RSL script used to generate the seed
   ootrversion TEXT,             -- Version of the randomizer used to generate the seed

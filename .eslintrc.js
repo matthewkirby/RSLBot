@@ -9,8 +9,10 @@ module.exports = {
     node: true, // Enable Node.js global variables
   },
   rules: {
-    quotes: [1, 'single', { 'avoidEscape': true }],
-    indent: [1, 2]
+    // quotes: [1, 'single', { 'avoidEscape': true }],
+    indent: [1, 2],
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [1]
   },
   ignorePatterns: ['node_modules', 'data', 'plando-random-settings']
 };
