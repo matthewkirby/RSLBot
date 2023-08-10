@@ -3,7 +3,8 @@ import { FatClient } from 'types/FatClient';
 import loadSlashCommands from '../commands';
 import { openDbConnection } from '../utils/dbInteraction';
 import { Database as DatabaseType } from 'better-sqlite3';
-import { loadButtonLibrary } from '../buttons';
+import { loadButtonLibrary, loadSelectMenus } from '../components';
+import { loadActionRows } from '../actionRows';
 
 export default (client: FatClient): void => {
   client.on('ready', async () => {
@@ -22,6 +23,8 @@ export default (client: FatClient): void => {
 
     // Load the button library
     client.buttonLibrary = await loadButtonLibrary();
+    client.selectMenuLibrary = await loadSelectMenus();
+    client.actionRows = await loadActionRows();
 
     // Open the database connection
     client.db = openDbConnection() as DatabaseType;
