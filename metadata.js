@@ -7,7 +7,7 @@ const rslPath = 'plando-random-settings/rslversion.py';
 if(fs.existsSync(rslPath)) {
     versionBody = fs.readFileSync(rslPath, 'utf8');
     rslVersion = versionBody.split('\n')[0].split('=')[1].trim().slice(1,-1);
-    ootrVersion = versionBody.split('\n')[2].split('=')[1].trim().split(' R')[0].slice(1).trim();
+    ootrVersion = versionBody.split('\n')[4].split('=')[1].trim().split(' Rob').join('').replaceAll("'", "");
 } else {
     throw new Error("RSL Script must be cloned in the bot directory.");
 }

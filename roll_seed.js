@@ -76,7 +76,7 @@ function rollSeed(interaction, userinfo, currentTime) {
     // Roll the seed
     proc.chdir('plando-random-settings')
     const pythonRSLArgs = preset === null ? ['--no_seed'] : ['--no_seed', preset];
-    const pythonOptions = { pythonPath: '/usr/bin/python3', args: pythonRSLArgs };
+    const pythonOptions = { pythonPath: '/usr/bin/python3.9', args: pythonRSLArgs };
     PythonShell.run("RandomSettingsGenerator.py", pythonOptions, (error, results) => {
         if(error) throw error;
         if(results.at(-1).startsWith('Plando File')) {
@@ -155,11 +155,13 @@ function checkSeedGenerationStatus(seedId, interaction, username, currentTime, p
 function unlockSeed(interaction) {
     const seedUrl = interaction.message.components[0].components[0].data.url;
     const seedId = seedUrl.split("=")[1]
-    interaction.update({content: interaction.message.content, components: [makeSeedButtons(seedUrl, null)] });
-    
-    // Unlock the log
-    fetch(`https://ootrandomizer.com/api/v2/seed/unlock?key=${process.env.OOTR_API_KEY}&id=${seedId}`,
-        {method: 'post', body: '', headers: {'Content-Type': 'application/json'}
+    interaction.update({content: interaction.message.content, components: [makeSeedButtons(seedUrl, null)] })
+    .then(() => {
+        // Unlock the log
+        return fetch(`https://ootrandomizer.com/api/v2/seed/unlock?key=${process.env.OOTR_API_KEY}&id=${seedId}`,
+            {method: 'post', body: '', headers: {'Content-Type': 'application/json'}
+        });
+
     })
     .then(res => {
         // Catch errors
