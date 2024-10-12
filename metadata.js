@@ -13,7 +13,7 @@ if(fs.existsSync(rslPath)) {
 }
 
 const metadata = {
-    season: 6,
+    season: 7,
     rslVersion: rslVersion,
     ootrVersion: ootrVersion,
     admin: ["xopar#0"],
