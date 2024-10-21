@@ -7,7 +7,7 @@ const { metadata } = require("./metadata.js");
 
 
 const presetList = {
-    'Beginner': '--override=weights/beginner_override.json',
+    'Lite': '--override=weights/beginner_override.json',
     'Intermediate': '--override=weights/intermediate_override.json',
     'DDR': '--override=weights/ddr_override.json',
     'Bingo': '--override=weights/bingo_override.json',
@@ -18,7 +18,7 @@ const presetList = {
 const unlockLogButton = new ButtonBuilder()
     .setCustomId('unlock_log')
     .setLabel('Unlock Spoiler Log')
-    .setStyle(ButtonStyle.Secondary);
+    .setStyle(ButtonStyle.Danger);
 
 const logUnlockedButton = new ButtonBuilder()
     .setCustomId('log_unlocked')

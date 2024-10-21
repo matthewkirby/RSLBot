@@ -52,6 +52,7 @@ function parseDM(msg) {
     const row = new ActionRowBuilder()
         .addComponents(
             rsl_seasonal_button,
+            rsl_lite_button,
             new ButtonBuilder()
                 .setCustomId('view_presets')
                 .setLabel('View Presets')
@@ -125,13 +126,18 @@ const rsl_seasonal_button = new ButtonBuilder()
     .setLabel(`Roll an S${metadata.season} RSL Seed (v${metadata.rslVersion})`)
     .setStyle(ButtonStyle.Primary);
 
+const rsl_lite_button = new ButtonBuilder()
+    .setCustomId('roll_Lite')
+    .setLabel("Roll an RSL Lite Seed")
+    .setStyle(ButtonStyle.Success)
+
 const presetrow = new ActionRowBuilder()
     .addComponents(
         rsl_seasonal_button,
         new ButtonBuilder()
-            .setCustomId('roll_Beginner')
-            .setLabel('Roll a Beginner RSL Seed')
-            .setStyle(ButtonStyle.Secondary),
+            .setCustomId('roll_Lite')
+            .setLabel('Roll an RSL Lite Seed')
+            .setStyle(ButtonStyle.Success),
         new ButtonBuilder()
             .setCustomId('roll_Intermediate')
             .setLabel('Roll an Intermediate RSL Seed')
