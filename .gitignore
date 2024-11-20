@@ -2,3 +2,5 @@
 node_modules
 plando-random-settings
 data/seed_log.json
+*.db
+*.tmp

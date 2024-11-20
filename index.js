@@ -1,4 +1,7 @@
-const { Client, GatewayIntentBits, Partials, ActivityType, Events } = require('discord.js');
+const fs = require('node:fs');
+const path = require('node:path');
+
+const { Client, Collection, GatewayIntentBits, Partials, ActivityType, Events } = require('discord.js');
 const {ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js')
 require("dotenv").config();
 const rs = require("./roll_seed.js");
@@ -10,6 +13,27 @@ const bot = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.DirectMessages],
     partials: [Partials.Channel]
 });
+
+// Attach the commands
+bot.commands = new Collection();
+const foldersPath = path.join(__dirname, 'commands');
+const commandFolders = fs.readdirSync(foldersPath);
+
+for (const folder of commandFolders) {
+	const commandsPath = path.join(foldersPath, folder);
+	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+	for (const file of commandFiles) {
+        console.log(`Loaded implementation for command: ${file}`)
+		const filePath = path.join(commandsPath, file);
+		const command = require(filePath);
+		// Set a new item in the Collection with the key as the command name and the value as the exported module
+		if ('data' in command && 'execute' in command) {
+			bot.commands.set(command.data.name, command);
+		} else {
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+		}
+	}
+}
 
 
 // Message for when we boot up
@@ -68,7 +92,20 @@ function parseDM(msg) {
 
 // Parse buttons
 bot.on(Events.InteractionCreate, interaction => {
-	if (!interaction.isButton()) return;
+    if (interaction.isButton()) {
+        handleButtonInteraction(interaction);
+    } else {
+        const command = interaction.client.commands.get(interaction.commandName);
+        if (!command) {
+            console.error(`No command matching ${interaction.commandName} was found.`);
+            return
+        }
+        command.execute(interaction);
+    }
+
+});
+
+function handleButtonInteraction(interaction) {
     const ctime = new Date(Date.now());
     const cid = interaction.customId;
     const userinfo = parse_user_info(interaction, "INTERACTION");
@@ -85,7 +122,7 @@ bot.on(Events.InteractionCreate, interaction => {
             components:[presetrow]
         })
     }
-});
+}
 
 
 function set_user_level(username) {
